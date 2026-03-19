@@ -1,5 +1,6 @@
 import time
 import json
+import logging
 from google import genai
 from django.conf import settings
 
@@ -8,12 +9,14 @@ from .validators import validate_ai_response
 from apps.core.exceptions import AIServiceError
 from .models import AIGenerationLog
 
+logger = logging.getLogger(__name__)
+
 
 class GeminiClient:
 
     def __init__(self):
-        self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
-        self.model = "gemini-2.5-flash"
+        self.client      = genai.Client(api_key=settings.GEMINI_API_KEY)
+        self.model       = "gemini-2.5-flash"
         self.max_retries = 3
 
     def generate_quiz_questions(
@@ -24,67 +27,58 @@ class GeminiClient:
         quiz_template_id=None
     ) -> list:
 
-        prompt = build_quiz_prompt(topic, count, difficulty)
-
+        prompt     = build_quiz_prompt(topic, count, difficulty)
         start_time = time.time()
-        retry_count = 0
         last_error = ""
+        raw_text   = ""
 
-        while retry_count < self.max_retries:
+        for attempt in range(self.max_retries):
             try:
-                # ✅ UPDATED API CALL (no types config)
                 response = self.client.models.generate_content(
-                    model=self.model,
-                    contents=prompt,
+                    model    = self.model,
+                    contents = prompt,
                 )
 
                 raw_text = response.text
-                parsed = self._parse_json_response(raw_text)
 
-                # 🔥 IMPORTANT: handle {"questions": [...]}
-                if isinstance(parsed, dict) and "questions" in parsed:
-                    parsed = parsed["questions"]
+                if not raw_text:
+                    raise AIServiceError("AI returned empty response.")
 
+                parsed    = self._parse_json_response(raw_text)
                 questions = validate_ai_response(parsed, count)
 
-                latency_ms = int((time.time() - start_time) * 1000)
-
                 self._log(
-                    quiz_template_id=quiz_template_id,
-                    prompt=prompt,
-                    raw_response=raw_text,
-                    status="success",
-                    latency_ms=latency_ms,
-                    retry_count=retry_count,
+                    quiz_template_id = quiz_template_id,
+                    prompt           = prompt,
+                    raw_response     = raw_text,
+                    status           = "success",
+                    latency_ms       = int((time.time() - start_time) * 1000),
+                    retry_count      = attempt,
                 )
 
                 return questions
 
             except AIServiceError as e:
                 last_error = e.message
-                retry_count += 1
+                logger.warning(f"Attempt {attempt + 1} failed (AIServiceError): {e.message}")
                 time.sleep(1)
 
             except Exception as e:
                 last_error = str(e)
-                retry_count += 1
+                logger.warning(f"Attempt {attempt + 1} failed (Exception): {str(e)}")
                 time.sleep(2)
 
-        latency_ms = int((time.time() - start_time) * 1000)
-
         self._log(
-            quiz_template_id=quiz_template_id,
-            prompt=prompt,
-            raw_response="",
-            status="failed",
-            latency_ms=latency_ms,
-            retry_count=retry_count,
-            error_message=last_error,
+            quiz_template_id = quiz_template_id,
+            prompt           = prompt,
+            raw_response     = raw_text,
+            status           = "failed",
+            latency_ms       = int((time.time() - start_time) * 1000),
+            retry_count      = self.max_retries,
+            error_message    = last_error,
         )
 
-        raise AIServiceError(
-            f"Quiz generation failed after {self.max_retries} attempts. Last error: {last_error}"
-        )
+        raise AIServiceError(f"Quiz generation failed. Last error: {last_error}")
 
     def generate_explanation(
         self,
@@ -100,15 +94,12 @@ class GeminiClient:
 
         try:
             response = self.client.models.generate_content(
-                model=self.model,
-                contents=prompt,
+                model    = self.model,
+                contents = prompt,
             )
+            parsed = self._parse_json_response(response.text)
 
-            raw_text = response.text
-            parsed = self._parse_json_response(raw_text)
-
-            required_keys = ["explanation", "why_wrong", "concept", "follow_up_tip"]
-            for key in required_keys:
+            for key in ["explanation", "why_wrong", "concept", "follow_up_tip"]:
                 if key not in parsed:
                     parsed[key] = "Not available."
 
@@ -116,17 +107,19 @@ class GeminiClient:
 
         except Exception:
             return {
-                "explanation": "Unable to generate explanation at this time.",
-                "why_wrong": "Please review the topic for more details.",
-                "concept": topic,
+                "explanation":   "Unable to generate explanation at this time.",
+                "why_wrong":     "Please review the topic for more details.",
+                "concept":       topic,
                 "follow_up_tip": "Try reviewing study materials on this topic.",
             }
 
     def _parse_json_response(self, raw_text: str) -> dict:
 
+        if not raw_text:
+            raise AIServiceError("AI returned empty response.")
+
         text = raw_text.strip()
 
-        # Remove markdown blocks if present
         if text.startswith("```"):
             text = text.split("\n", 1)[-1]
 
@@ -136,9 +129,17 @@ class GeminiClient:
         text = text.strip()
 
         try:
-            return json.loads(text)
+            parsed = json.loads(text)
         except json.JSONDecodeError as e:
-            raise AIServiceError(f"AI returned invalid JSON. Parse error: {str(e)}")
+            raise AIServiceError(f"AI returned invalid JSON: {str(e)}")
+
+        if isinstance(parsed, list):
+            return {"questions": parsed}
+
+        if not isinstance(parsed, dict):
+            raise AIServiceError(f"Unexpected AI response type: {type(parsed).__name__}")
+
+        return parsed
 
     def _log(
         self,
@@ -154,14 +155,14 @@ class GeminiClient:
 
         try:
             AIGenerationLog.objects.create(
-                quiz_template_id=quiz_template_id,
-                prompt_used=prompt,
-                raw_response=raw_response,
-                status=status,
-                latency_ms=latency_ms,
-                retry_count=retry_count,
-                error_message=error_message,
-                tokens_used=tokens_used,
+                quiz_template_id = quiz_template_id,
+                prompt_used      = prompt,
+                raw_response     = raw_response,
+                status           = status,
+                latency_ms       = latency_ms,
+                retry_count      = retry_count,
+                error_message    = error_message,
+                tokens_used      = tokens_used,
             )
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"AIGenerationLog save failed: {e}")
