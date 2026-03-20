@@ -1,0 +1,3407 @@
+{
+  "info": {
+    "_postman_id": "87e4fe80-68f3-4d62-9d28-de58a7fc6569",
+    "name": "Quiz_api",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53307040",
+    "_collection_link": "https://go.postman.co/collection/53307040-87e4fe80-68f3-4d62-9d28-de58a7fc6569?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));\r",
+                  "pm.test(\"Returns success\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.status).to.equal(\"success\");\r",
+                  "    pm.expect(d.data.user.role).to.equal(\"student\");\r",
+                  "    pm.expect(d.data.tokens.access).to.be.a(\"string\");\r",
+                  "});\r",
+                  "const d = pm.response.json();\r",
+                  "pm.environment.set(\"access_token\", d.data.tokens.access);\r",
+                  "pm.environment.set(\"refresh_token\", d.data.tokens.refresh);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"student_test\",\r\n    \"email\": \"student@example.com\",\r\n    \"password\": \"SecurePass123!\",\r\n    \"password_confirm\": \"SecurePass123!\",\r\n    \"role\": \"student\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Teacher",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));\r",
+                  "pm.test(\"Role is teacher\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.user.role).to.equal(\"teacher\");\r",
+                  "});\r",
+                  "const d = pm.response.json();\r",
+                  "pm.environment.set(\"teacher_access_token\", d.data.tokens.access);\r",
+                  "pm.environment.set(\"teacher_refresh_token\", d.data.tokens.refresh);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"teacher_test\",\r\n    \"email\": \"teacher@example.com\",\r\n    \"password\": \"SecurePass123!\",\r\n    \"password_confirm\": \"SecurePass123!\",\r\n    \"role\": \"teacher\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Fail Password Mismatch",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));\r",
+                  "pm.test(\"Password error returned\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.status).to.equal(\"error\");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"failuser\",\r\n    \"email\": \"fail@example.com\",\r\n    \"password\": \"SecurePa123!\",\r\n    \"password_confirm\": \"Differe123!\",\r\n    \"role\": \"student\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Fail Duplicate Username",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));\r",
+                  "pm.test(\"Duplicate username error\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.errors.username[0]).to.include(\"already exists\");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"student_test\",\r\n    \"email\": \"another@example.com\",\r\n    \"password\": \"SecurePass123!\",\r\n    \"password_confirm\": \"SecurePass123!\",\r\n    \"role\": \"student\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Fail Weak Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));\r",
+                  "pm.test(\"Weak password rejected\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.status).to.equal(\"error\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"weakuser\",\r\n    \"email\": \"weak@example.com\",\r\n    \"password\": \"123\",\r\n    \"password_confirm\": \"123\",\r\n    \"role\": \"student\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Student Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Login successful\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.status).to.equal(\"success\");\r",
+                  "    pm.expect(d.data.tokens.access).to.be.a(\"string\");\r",
+                  "});\r",
+                  "const d = pm.response.json();\r",
+                  "pm.environment.set(\"access_token\", d.data.tokens.access);\r",
+                  "pm.environment.set(\"refresh_token\", d.data.tokens.refresh);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"student_test\",\r\n    \"password\": \"SecurePass123!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Fail Wrong Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.response.to.have.status(401));\r",
+                  "pm.test(\"Invalid credentials error\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.code).to.equal(\"invalid_credentials\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"student_test\",\r\n    \"password\": \"wrongpassword\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Fail Missing Fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));\r",
+                  "pm.test(\"Missing fields error\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.status).to.equal(\"error\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"student_test\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Returns user profile\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.username).to.equal(\"student_test\");\r",
+                  "    pm.expect(d.data.role).to.equal(\"student\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/me/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Profile No Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/me/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Bio updated\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.bio).to.equal(\"I love Python and Django.\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"bio\": \"I love Python and Django.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/me/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Password changed\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.message).to.equal(\"Password changed successfully.\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"old_password\": \"SecurePass123!\",\r\n    \"new_password\": \"NewSecurePass456!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/me/password/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me",
+                "password",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password Fail",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));\r",
+                  "pm.test(\"Wrong password error\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.message).to.include(\"incorrect\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"old_password\": \"WrongOldPass!\",\r\n    \"new_password\": \"NewSecurePass456!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/me/password/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me",
+                "password",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"New tokens returned\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.access).to.be.a(\"string\");\r",
+                  "});\r",
+                  "const d = pm.response.json();\r",
+                  "pm.environment.set(\"access_token\", d.access);\r",
+                  "pm.environment.set(\"refresh_token\", d.refresh);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"refresh\": \"{{refresh_token}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/token/refresh/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "token",
+                "refresh",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Logout successful\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.message).to.equal(\"Logged out successfully.\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"refresh\": \"{{refresh_token}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/logout/?",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": null,
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Quizzes",
+      "item": [
+        {
+          "name": "Generate Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));\r",
+                  "pm.test(\"Quiz is ready\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.status).to.equal(\"ready\");\r",
+                  "    pm.expect(d.data.question_count_actual).to.equal(3);\r",
+                  "    pm.expect(d.data.topic).to.equal(\"Python lists\");\r",
+                  "});\r",
+                  "const d = pm.response.json();\r",
+                  "pm.environment.set(\"quiz_id\", d.data.id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"topic\": \"Python lists\",\r\n    \"question_count\": 3,\r\n    \"difficulty\": \"easy\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/generate/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "generate",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Fail Invalid Difficulty",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));\r",
+                  "pm.test(\"Difficulty error\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.status).to.equal(\"error\");\r",
+                  "    pm.expect(JSON.stringify(d.errors)).to.include(\"difficulty\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"topic\": \"Python lists\",\r\n    \"question_count\": 3,\r\n    \"difficulty\": \"extreme\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/generate/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "generate",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Fail Topic Too Short",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));\r",
+                  "pm.test(\"Topic too short error\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(JSON.stringify(d.errors)).to.include(\"topic\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"topic\": \"ab\",\r\n    \"question_count\": 3,\r\n    \"difficulty\": \"easy\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/generate/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "generate",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Fail Count Too High",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));\r",
+                  "pm.test(\"Count too high error\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(JSON.stringify(d.errors)).to.include(\"question_count\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"topic\": \"Python\",\r\n    \"question_count\": 50,\r\n    \"difficulty\": \"easy\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/generate/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "generate",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Cache Hit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));\r",
+                  "pm.test(\"Same quiz returned from cache\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.id).to.equal(pm.environment.get(\"quiz_id\"));\r",
+                  "});\r",
+                  "pm.test(\"Response under 500ms\", () => {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"topic\": \"Python lists\",\r\n    \"question_count\": 3,\r\n    \"difficulty\": \"easy\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/generate/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "generate",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List All Quizzes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Pagination present\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.pagination).to.be.an(\"object\");\r",
+                  "    pm.expect(d.results).to.be.an(\"array\");\r",
+                  "    pm.expect(d.pagination.count).to.be.above(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filter by Difficulty",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"All results are easy\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    d.results.forEach(q => {\r",
+                  "        pm.expect(q.difficulty).to.equal(\"easy\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/?difficulty=easy",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "difficulty",
+                  "value": "easy"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filter by Topic",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Results contain python in topic\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    d.results.forEach(q => {\r",
+                  "        pm.expect(q.topic.toLowerCase()).to.include(\"python\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/?topic=python",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "topic",
+                  "value": "python"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Quiz Detail with Questions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Quiz has questions and options\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.questions).to.be.an(\"array\");\r",
+                  "    pm.expect(d.data.questions.length).to.equal(3);\r",
+                  "    pm.expect(d.data.questions[0].options.length).to.equal(4);\r",
+                  "});\r",
+                  "\r",
+                  "// Save question and option IDs for attempt tests\r",
+                  "const d = pm.response.json();\r",
+                  "const q = d.data.questions;\r",
+                  "pm.environment.set(\"question_id_1\", q[0].id);\r",
+                  "pm.environment.set(\"question_id_2\", q[1].id);\r",
+                  "pm.environment.set(\"question_id_3\", q[2].id);\r",
+                  "pm.environment.set(\"option_id_1\", q[0].options[0].id);\r",
+                  "pm.environment.set(\"option_id_2\", q[1].options[0].id);\r",
+                  "pm.environment.set(\"option_id_3\", q[2].options[0].id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/{{quiz_id}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "{{quiz_id}}",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Quiz Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));\r",
+                  "pm.test(\"Not found error\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.status).to.equal(\"error\");\r",
+                  "    pm.expect(d.message).to.include(\"not found\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/00000000-0000-0000-0000-000000000000/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "00000000-0000-0000-0000-000000000000",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Quizzes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Returns only my quizzes\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.results).to.be.an(\"array\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/mine/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "mine",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Quiz Student Forbidden",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));\r",
+                  "pm.test(\"Permission denied\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.status).to.equal(\"error\");\r",
+                  "    pm.expect(d.message).to.include(\"permission\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/{{quiz_id}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "{{quiz_id}}",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Attempts",
+      "item": [
+        {
+          "name": "Start Attempt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));\r",
+                  "pm.test(\"Session created\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.status).to.equal(\"in_progress\");\r",
+                  "    pm.expect(d.data.total_questions).to.equal(3);\r",
+                  "});\r",
+                  "const d = pm.response.json();\r",
+                  "pm.environment.set(\"session_id\", d.data.id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"quiz_id\": \"{{quiz_id}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/start/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "start",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Start Attempt Resume",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));\r",
+                  "pm.test(\"Same session returned\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.id).to.equal(pm.environment.get(\"session_id\"));\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"quiz_id\": \"{{quiz_id}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/start/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "start",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Start Attempt Quiz Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));\r",
+                  "pm.test(\"Quiz not found error\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.status).to.equal(\"error\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"quiz_id\": \"00000000-000000000000\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/start/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "start",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Answer Q1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Answer recorded\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.status).to.equal(\"success\");\r",
+                  "    pm.expect(d.is_correct).to.be.a(\"boolean\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"question_id\": \"{{question_id_1}}\",\r\n    \"selected_option_id\": \"{{option_id_1}}\",\r\n    \"time_taken_seconds\": 12\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/{{session_id}}/answer/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "{{session_id}}",
+                "answer",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Answer Q2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"question_id\": \"{{question_id_2}}\",\r\n    \"selected_option_id\": \"{{option_id_2}}\",\r\n    \"time_taken_seconds\": 18\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/{{session_id}}/answer/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "{{session_id}}",
+                "answer",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Answer Q3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"question_id\": \"{{question_id_3}}\",\r\n    \"selected_option_id\": \"{{option_id_3}}\",\r\n    \"time_taken_seconds\": 9\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/{{session_id}}/answer/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "{{session_id}}",
+                "answer",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Answer Wrong Question",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));\r",
+                  "pm.test(\"Question not found\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.message).to.include(\"not found\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"question_id\": \"00000000-0000-0000-0000-000000000000\",\r\n    \"selected_option_id\": \"{{option_id_1}}\",\r\n    \"time_taken_seconds\": 5\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/{{session_id}}/answer/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "{{session_id}}",
+                "answer",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Attempt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Attempt completed\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.status).to.equal(\"completed\");\r",
+                  "    pm.expect(d.data.score).to.be.a(\"number\");\r",
+                  "    pm.expect(d.data.correct_count).to.be.a(\"number\");\r",
+                  "    pm.expect(d.data.time_taken_seconds).to.be.above(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/{{session_id}}/submit/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "{{session_id}}",
+                "submit",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Attempt Already Completed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));\r",
+                  "pm.test(\"Already completed error\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.message).to.include(\"already completed\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/{{session_id}}/submit/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "{{session_id}}",
+                "submit",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Results",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Results have responses\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.responses).to.be.an(\"array\");\r",
+                  "    pm.expect(d.data.responses.length).to.equal(3);\r",
+                  "    pm.expect(d.data.responses[0].correct_option).to.be.a(\"string\");\r",
+                  "});\r",
+                  "\r",
+                  "// Save a wrong answer question id for explanation tests\r",
+                  "const d = pm.response.json();\r",
+                  "const wrong = d.data.responses.find(r => !r.is_correct);\r",
+                  "if (wrong) {\r",
+                  "    pm.environment.set(\"wrong_question_id\", wrong.id);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/{{session_id}}/result/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "{{session_id}}",
+                "result",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Attempt History",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"History returns sessions\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.results).to.be.an(\"array\");\r",
+                  "    pm.expect(d.results.length).to.be.above(0);\r",
+                  "    pm.expect(d.results[0].status).to.equal(\"completed\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/history/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "history",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Explanation",
+      "item": [
+        {
+          "name": "Explain Wrong Answer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Explanation has all fields\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.explanation).to.be.a(\"string\");\r",
+                  "    pm.expect(d.data.why_wrong).to.be.a(\"string\");\r",
+                  "    pm.expect(d.data.concept).to.be.a(\"string\");\r",
+                  "    pm.expect(d.data.follow_up_tip).to.be.a(\"string\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"question_id\": \"{{question_id_1}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/{{session_id}}/explain/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "{{session_id}}",
+                "explain",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Explain Correct Answer Fail",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));\r",
+                  "pm.test(\"Correct answer explanation rejected\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.message).to.include(\"incorrect answers\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"question_id\": \"{{question_id_3}}\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/{{session_id}}/explain/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "{{session_id}}",
+                "explain",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Explain Same Answer Cached",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Cached response is fast\", () => {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"question_id\": \"{{question_id_1}}\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/{{session_id}}/explain/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "{{session_id}}",
+                "explain",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Explain Incomplete Attempt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));\r",
+                  "pm.test(\"Not found error\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.status).to.equal(\"error\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"question_id\": \"{{question_id_1}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/{{session_id}}/explain/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "{{session_id}}",
+                "explain",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Personal Dashboard",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Dashboard has stats\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.total_attempts).to.be.above(0);\r",
+                  "    pm.expect(d.data.average_score).to.be.a(\"number\");\r",
+                  "    pm.expect(d.data.username).to.equal(\"student_test\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/me/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "analytics",
+                "me",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Topic Mastery",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Topic mastery returned\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data).to.be.an(\"array\");\r",
+                  "    pm.expect(d.data.length).to.be.above(0);\r",
+                  "    pm.expect(d.data[0].mastery_score).to.be.a(\"number\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/me/topics/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "analytics",
+                "me",
+                "topics",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Performance Trend",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Trend data returned\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data).to.be.an(\"array\");\r",
+                  "    pm.expect(d.data[0].score).to.be.a(\"number\");\r",
+                  "    pm.expect(d.data[0].topic).to.be.a(\"string\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/me/trend/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "analytics",
+                "me",
+                "trend",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Leaderboard",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Leaderboard returned\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data).to.be.an(\"array\");\r",
+                  "    pm.expect(d.topic).to.equal(\"Python lists\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/leaderboard/Python lists/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "analytics",
+                "leaderboard",
+                "Python lists",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Weak Topics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Weak topics returned\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data).to.be.an(\"array\");\r",
+                  "    pm.expect(d.message).to.include(\"weak topic\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/me/weak/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "analytics",
+                "me",
+                "weak",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Teacher",
+      "item": [
+        {
+          "name": "Teacher Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Role is teacher\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.user.role).to.equal(\"teacher\");\r",
+                  "});\r",
+                  "const d = pm.response.json();\r",
+                  "pm.environment.set(\"teacher_access_token\", d.data.tokens.access);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"teacher_test\",\r\n    \"password\": \"SecurePass123!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Quiz With Title",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));\r",
+                  "pm.test(\"Custom title used\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.title).to.equal(\"Advanced DRF Assessment\");\r",
+                  "    pm.expect(d.data.status).to.equal(\"ready\");\r",
+                  "});\r",
+                  "const d = pm.response.json();\r",
+                  "pm.environment.set(\"teacher_quiz_id\", d.data.id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"topic\": \"Django REST Framework\",\r\n    \"question_count\": 3,\r\n    \"difficulty\": \"hard\",\r\n    \"title\": \"Advanced DRF Assessment\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/generate/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "generate",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Own Quizzes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Own quizzes returned\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.results).to.be.an(\"array\");\r",
+                  "    pm.expect(d.results.length).to.be.above(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/mine/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "mine",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "View All Quizzes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Can see all quizzes\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.pagination.count).to.be.above(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Own Quiz",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Quiz deleted\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.message).to.include(\"deleted\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/{{teacher_quiz_id}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "{{teacher_quiz_id}}",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Student Quiz Fail",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));\r",
+                  "pm.test(\"Cannot delete others quiz\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.message).to.include(\"own quizzes\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/{{quiz_id}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "{{quiz_id}}",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Start Attempt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));\r",
+                  "pm.test(\"Teacher can take quiz\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.status).to.equal(\"in_progress\");\r",
+                  "});\r",
+                  "const d = pm.response.json();\r",
+                  "pm.environment.set(\"teacher_session_id\", d.data.id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"quiz_id\": \"{{quiz_id}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/start/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "start",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Answers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"question_id\": \"{{question_id_1}}\",\r\n    \"selected_option_id\": \"{{option_id_1}}\",\r\n    \"time_taken_seconds\": 10\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/{{teacher_session_id}}/answer/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "{{teacher_session_id}}",
+                "answer",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Attempt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Attempt completed\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.status).to.equal(\"completed\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/{{teacher_session_id}}/submit/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "{{teacher_session_id}}",
+                "submit",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cannot View Student Session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.response.to.have.status(404));\r",
+                  "pm.test(\"Cannot access others session\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.status).to.equal(\"error\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/attempts/{{session_id}}/result/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                "{{session_id}}",
+                "result",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "View Own Analytics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Teacher own analytics\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.username).to.equal(\"teacher_test\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/me/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "analytics",
+                "me",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Topic Mastery",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Teacher topic mastery returned\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data).to.be.an(\"array\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/me/topics/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "analytics",
+                "me",
+                "topics",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Role is admin\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.user.role).to.equal(\"admin\");\r",
+                  "});\r",
+                  "const d = pm.response.json();\r",
+                  "pm.environment.set(\"admin_access_token\", d.data.tokens.access);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"Admin123@\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Quiz",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));\r",
+                  "const d = pm.response.json();\r",
+                  "pm.environment.set(\"admin_quiz_id\", d.data.id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"topic\": \"System Design\",\r\n    \"question_count\": 3,\r\n    \"difficulty\": \"hard\",\r\n    \"title\": \"System Design Fundamentals\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/generate/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "generate",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Student Quiz",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Admin deleted student quiz\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.message).to.include(\"deleted\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/{{quiz_id}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "{{quiz_id}}",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "View All Quizzes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Admin sees all quizzes\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.pagination.count).to.be.above(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "View Own Analytics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Admin username correct\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data.username).to.equal(\"admin_test\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/me/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "analytics",
+                "me",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "View Leaderboard",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));\r",
+                  "pm.test(\"Leaderboard has data\", () => {\r",
+                  "    const d = pm.response.json();\r",
+                  "    pm.expect(d.data).to.be.an(\"array\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/analytics/leaderboard/Python lists/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "analytics",
+                "leaderboard",
+                "Python lists",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Access Swagger Docs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Swagger loads\", () => pm.response.to.have.status(200));\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/docs/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "docs",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Admin Panel Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Admin panel accessible\", () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Own Quiz",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/quizzes/{{admin_quiz_id}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                "{{admin_quiz_id}}",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Security",
+      "item": [
+        {
+          "name": "Rate Limit Quiz Generation",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Expired Token Rejected",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Blacklisted Token Rejected",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"refresh\": \"0c0e4dcf93894a2dbbf746bed5e1ca6a\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
