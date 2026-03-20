@@ -8,7 +8,6 @@ A production-grade REST API for an AI-powered quiz platform built with Django an
 
 | Resource | URL |
 |---|---|
-| **Live API** | https://quiz-api-production-589c.up.railway.app |
 | **Swagger Docs** | https://quiz-api-production-589c.up.railway.app/api/docs/ |
 | **Admin Panel** | https://quiz-api-production-589c.up.railway.app/admin/ |
 | **GitHub Repo** | https://github.com/PraneetAR/quiz-api |
