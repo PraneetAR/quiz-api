@@ -534,7 +534,7 @@ All Gemini communication is isolated in `apps/ai_service/`. No other app imports
 ### UUID Primary Keys
 
 Every model uses UUID instead of auto-increment integers. Integer IDs are sequential and guessable — an attacker can enumerate all records by incrementing the ID. UUIDs are 122 random bits, impossible to guess, and safe to expose in URLs.
-Note: `CustomUser` uses Django's default integer ID (inherited from AbstractUser).
+> Note: `CustomUser` uses Django's default integer ID (inherited from AbstractUser).
 > All other models use UUID primary keys via BaseModel.
 
 ### Soft Delete
