@@ -29,12 +29,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-87mhrzjaw3^4_%i^t$80mx9gk7+x2e#vm14%5=3hy$$tju)9m6'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "").split(",")
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
 
 # Application definition
+CSRF_TRUSTED_ORIGINS = [
+    "https://quiz-api-production-589c.up.railway.app",
+]
 
 INSTALLED_APPS = [
     # Django built-ins
