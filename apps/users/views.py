@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from drf_spectacular.utils import extend_schema
+from apps.core.throttles import LoginThrottle
 
 from .serializers import UserProfileSerializer, ChangePasswordSerializer
 from .services import register_user, login_user, logout_user, change_password
@@ -31,6 +32,7 @@ class RegisterView(APIView):
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes   = [LoginThrottle]
 
     @extend_schema(summary="Login and get JWT tokens")
     def post(self, request):

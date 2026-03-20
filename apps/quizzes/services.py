@@ -12,7 +12,9 @@ def get_or_generate_quiz(topic: str, question_count: int, difficulty: str, title
 
     if cached_id:
         try:
-            existing = QuizTemplate.objects.get(id=cached_id, status="ready", is_active=True)
+            existing = QuizTemplate.objects.prefetch_related(
+                        "questions__options"
+                        ).get(id=cached_id, status="ready", is_active=True)
             return existing
         except QuizTemplate.DoesNotExist:
             cache.delete(cache_key)

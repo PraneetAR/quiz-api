@@ -35,6 +35,14 @@ class QuizSession(BaseModel):
 
     class Meta:
         ordering = ["-created_at"]
+        indexes  = [
+            models.Index(fields=["user", "status"]),
+            models.Index(fields=["user", "created_at"]),
+            models.Index(fields=["quiz", "status"]),
+        ]
+
+    class Meta:
+        ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["user", "status"]),
         ]
@@ -74,6 +82,9 @@ class QuestionResponse(BaseModel):
 
     class Meta:
         unique_together = ("session", "question")
+        indexes         = [
+            models.Index(fields=["session", "is_correct"]),
+        ]
 
     def __str__(self):
         result = "✓" if self.is_correct else "✗"

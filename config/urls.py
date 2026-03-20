@@ -20,6 +20,11 @@ from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView,
 )
+from django.contrib import admin
+
+admin.site.site_header  = "Quiz API Admin"
+admin.site.site_title   = "Quiz API"
+admin.site.index_title  = "Dashboard"
 
 urlpatterns = [
     path("admin/",            admin.site.urls),
@@ -29,5 +34,7 @@ urlpatterns = [
     path("api/schema/",  SpectacularAPIView.as_view(),   name="schema"),
     path("api/docs/",    SpectacularSwaggerView.as_view(
                             url_name="schema"), name="swagger-ui"),
-    path("api/v1/quizzes/", include("apps.quizzes.urls")),                        
+    path("api/v1/quizzes/", include("apps.quizzes.urls")),    
+    path("api/v1/attempts/", include("apps.attempts.urls")),
+    path("api/v1/analytics/", include("apps.analytics.urls")),                    
 ]

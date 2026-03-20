@@ -5,6 +5,7 @@ from rest_framework import status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from drf_spectacular.utils import extend_schema
+from apps.core.throttles import QuizGenerationThrottle
 
 from .models import QuizTemplate
 from .serializers import (
@@ -23,6 +24,7 @@ from apps.core.pagination import StandardPagination
 
 class QuizGenerateView(APIView):
     permission_classes = [IsAuthenticated]
+    throttle_classes   = [QuizGenerationThrottle]
 
     @extend_schema(summary="Generate a new quiz using AI")
     def post(self, request):
@@ -53,7 +55,6 @@ class QuizGenerateView(APIView):
                 "status":  "error",
                 "message": e.message
             }, status=status.HTTP_400_BAD_REQUEST)
-
 
 class QuizListView(APIView):
     permission_classes = [IsAuthenticated]
